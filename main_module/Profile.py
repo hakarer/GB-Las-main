@@ -64,6 +64,8 @@ async def format_timedelta(delta):
 
 
 
+
+        
 @profile_labeler.message(From_Me(), Prefix(), text=['<pref>+др', '<pref>+др <link>'])
 async def manage_friends(message: Message, link: str = None):
     user_id = message.reply_message.from_id if message.reply_message else await get_id(message=message, text=link)
