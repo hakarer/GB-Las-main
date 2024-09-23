@@ -62,10 +62,75 @@ async def format_timedelta(delta):
     else:
         return f"{seconds} секунд"
 
-    # Обработчик команды "gb проверь айди"
 
 
+@profile_labeler.message(From_Me(), Prefix(), text=['<pref>+др', '<pref>+др <link>'])
+async def manage_friends(message: Message, link: str = None):
+    user_id = message.reply_message.from_id if message.reply_message else await get_id(message=message, text=link)
+    if not user_id:
+        return await mess_new(message=message, text="⚠ ID пользователя не найдено.", red=True)
+    try:
+        random_id = random.getrandbits(31)
+        user_info = await api.users.get(user_ids=user_id)
+        user_name = f"{user_info[0].first_name} {user_info[0].last_name}"
+        friend_status = (await api.friends.are_friends(user_ids=[user_id]))[0].friend_status
 
+        if friend_status == 3:
+            await mess_new(message=message, text=f" [id{user_id}|{user_name}] уже у вас в друзьях.", red=True)
+        else:
+            await api.friends.add(user_id=user_id, random_id=random_id)
+            if friend_status == 2:
+                await mess_new(message=message, text=f"Заявка от [id{user_id}|{user_name}] принята.", red=True)
+            else:
+                await mess_new(message=message, text=f"Заявка в друзья [id{user_id}|{user_name}] отправлена.", red=True)
+    except VKAPIError as e:
+        if "blacklist" in str(e):
+            await mess_new(message=message, text=f"⚠ Ошибка : [id{user_id}|{user_name}] добавил вас в чс", red=True)
+        else:
+            await mess_new(message=message, text=f"⚠ Ошибка: {e}", red=True)
+###########################################################
+
+@profile_labeler.message(From_Me(), Prefix(), text=['<pref>-др', '<pref>-др <link>'])
+async def remove_friend(message: Message, link: str = None):
+    user_id = message.reply_message.from_id if message.reply_message else await get_id(message=message, text=link)
+
+    if not user_id:
+        return await mess_new(message=message, text="⚠ ID пользователя не найдено.", red=True)
+
+    try:
+        user_info = await api.users.get(user_ids=user_id)
+        user_name = f"{user_info[0].first_name} {user_info[0].last_name}"
+
+        friend_status = (await api.friends.are_friends(user_ids=[user_id]))[0].friend_status
+
+        if friend_status == 0:
+            await mess_new(message=message, text=f"⚠ [id{user_id}|{user_name}] уже не является вашим другом.", red=True)
+        elif friend_status == 3:
+            await api.friends.delete(user_id=user_id)
+            await mess_new(message=message, text=f"[id{user_id}|{user_name}] успешно удалён из друзей.", red=True)
+        else:
+            await mess_new(message=message, text=f"⚠ Невозможно удалить [id{user_id}|{user_name}] из друзей, поскольку Его(Её) заявка в друзья ждет вашего одобрения .", red=True)
+    except VKAPIError as e:
+        if "blacklist" in str(e):
+            await mess_new(message=message, text=f"⚠ Ошибка : [id{user_id}|{user_name}] добавил вас в чс", red=True)
+        else:
+            await mess_new(message=message, text=f"⚠ Ошибка: {e}", red=True)
+###########################################################
+
+@profile_labeler.message(From_Me(),Prefix(),text=['<pref>айди', '<pref>айди <link>','<pref>id', '<pref>id <link>','<pref>fqlb', '<pref>fqlb <link>','<pref>шв', '<pref>шв <link>'])
+@error
+async def user_id_check(message: Message,link: str = None):
+    
+    user_id = await get_id(message=message, text=link)
+
+    try:
+        if user_id:
+            await mess_new(message=message, text=f"🀄 ID Пользователя: {user_id}",red=True)
+        else:
+            await mess_new(message=message, text=f"⚠ ID Пользователя не найдено.",red=True)
+    except:
+        await mess_new(message=message, text=f"⚠ Параметры пользователя указаны не верно.",red=True)
+###########################################################
 
 @profile_labeler.message(From_Me(),Prefix(),text=['<pref>профиль','<pref>профиль <link> <link2>','<pref>инфо <link> <link2>','<pref>профиль <link>','<pref>инфо <link>','<pref>инфо',])
 @error
@@ -302,8 +367,7 @@ async def profile(message: Message, link: str=None, link2: str=None):
                 peer_id=message.peer_id,
                 message=response_message
             )
-
-
+###########################################################
 
 @profile_labeler.message(From_Me(),Prefix(),text=['<pref>стики','<pref>стики <link>'])
 @error
@@ -360,7 +424,7 @@ async def profile(message: Message, link: str=None, link2: str=None):
         )
 
         await mess_new(message=message,text=text,red=True)
-
+###########################################################
 
 class SticerPack:
     '''ОБЪЕКТ'''

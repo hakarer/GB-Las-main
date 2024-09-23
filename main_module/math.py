@@ -24,18 +24,10 @@ async def math(message: Message, expression:str):
         try:
             expression = expression.replace("^", "**")
             
-            result = eval(expression)
-            await api.messages.edit(
-                peer_id=message.peer_id,
-                conversation_message_id=message.conversation_message_id,
-                message=f"🧮 Результат: {expression}={result}"
-            )
+            result = eval(expression)         
+            await mess_new(message=message, text=f"🧮 Результат: {expression}= {result}",red=True)
         except Exception as e:
-            await api.messages.edit(
-                peer_id=message.peer_id,
-                conversation_message_id=message.conversation_message_id,
-                message="Ошибка: Неверное выражение"
-            )
+            await mess_new(message=message, text=f"⚠ Ошибка: Неверное выражение",red=True)
 
 
 
@@ -122,5 +114,7 @@ async def Su(message: Message, text: str):
             response_received.set()
         
         await asyncio.sleep(0.1)
+
+        
 
     await wait_task

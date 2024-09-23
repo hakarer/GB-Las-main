@@ -22,11 +22,10 @@ labeler.load(main_labeler) # Основной модуль ✅
 labeler.load(test_labeler) # Тестовый модуль
 labeler.load(profile_labeler)
 labeler.load(math_labeler)
-labeler.load(rp_labeler) # Рп модуль  ✅
 
 
 
-
+labeler.load(rp_labeler) # Рп модуль  ОСТАВЛЯТЬ ПОСЛЕДНИМ✅
 labeler.load(pres_bet_labeler) # Пресбет модуль ОСТАВЛЯТЬ ПОСЛЕДНИМ✅
 
 logger.disable("vkbottle")
